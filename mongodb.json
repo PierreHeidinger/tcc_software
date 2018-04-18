@@ -1,0 +1,7 @@
+{
+    "server" : "ds227199.mlab.com",
+    "port" : "27199",
+    "database" : "mongomlab",
+    "user" : "admin",
+    "password" : "admin"
+}
