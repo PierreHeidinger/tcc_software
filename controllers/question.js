@@ -1,73 +1,64 @@
 
 const { ReadExcel } = require('../services/excel')
-
-const Question = require('../models/questions');
-const Profile  = require('../models/profiles')
-const Group = require('../models/groups')
-
-
-
-module.exports = {
-        List : list,
-        Create : create,
-        Update : update,
-        Remove : remove,
-        LoadQuetions : loadMassive
-}
+const { Question ,Profile , Group } = require('../models/index');
 
 /**
- * Public functions
+ * Public class Controller
  */
 
-async function list(req,res){
-    const questions = await Question.find({}).exec();
-    return res.status(200).json(questions);
-};
-
-async function create(req,res){
-    const content = req.body;
-    const question = new Question(content);
-
-    const newQuestion = await question.save();
-
-    return res.status(200).json(newQuestion);
-};
-
-async function update(req,res){
-
-    const id = req.params._id;
-    const content = req.body;
-
-    const question = await Question.findOneAndUpdate(id,content).exec();
-
-    return res.status(200).json(question);
-};
-
-async function remove(req,res){
-
-    const id = req.params._id;
-
-    const result = await Question.findByIdAndRemove(id);
-
-    return res.status(200).json(result);
-}
-
-async function loadMassive(req,res){
-
-    const dir = req.body.dir;
-    const information = await ReadExcel(dir);
-
-    const lista = await readInformation(information);
-
-    const profiles = await createOrUpdateProfiles(lista.profiles);
-
-    const groups = await createOrUpdateGroups(lista.groups);
-
-    const question = await createOrUpdateQuestions(lista.questions);
-
-    res.status(200).json({message : "sending information to mongodb , wait please"});
+ class QuestionController {
+     
+    async List(req,res){
+        const questions = await Question.find({}).exec();
+        return res.status(200).json(questions);
+    };
     
-}
+    async Create(req,res){
+        const content = req.body;
+        const question = new Question(content);
+    
+        const newQuestion = await question.save();
+    
+        return res.status(200).json(newQuestion);
+    };
+    
+    async Update(req,res){
+    
+        const id = req.params._id;
+        const content = req.body;
+    
+        const question = await Question.findOneAndUpdate(id,content).exec();
+    
+        return res.status(200).json(question);
+    };
+    
+    async Remove(req,res){
+    
+        const id = req.params._id;
+    
+        const result = await Question.findByIdAndRemove(id);
+    
+        return res.status(200).json(result);
+    }
+    
+    async LoadMassive(req,res){
+    
+        const dir = req.body.dir;
+        const information = await ReadExcel(dir);
+    
+        const lista = await readInformation(information);
+    
+        const profiles = await createOrUpdateProfiles(lista.profiles);
+    
+        const groups = await createOrUpdateGroups(lista.groups);
+    
+        const question = await createOrUpdateQuestions(lista.questions);
+    
+        res.status(200).json({message : "sending information to mongodb , wait please"});
+        
+    }
+    
+ }
 
 /**
  * Private functions 
@@ -141,3 +132,8 @@ async function createOrUpdateQuestions(questions){
     }
 }
 
+
+//Exports class
+module.exports = {
+    QuestionController
+}

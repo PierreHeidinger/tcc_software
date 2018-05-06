@@ -1,50 +1,43 @@
+//models
+const {Schedule,Teacher,Student} = require('../models/index');
 
-const Teacher = require('../models/teachers');
-const Student = require('../models/students');
-const Schedule = require('../models/schedule');
 const Excel = require('../services/excel');
-
-
 const {  typeSchedule } = require('../const/types')
 
 
 
-
-module.exports = {
-    LoadScheduleTeachers : loadMassiveTeachers,
-    LoadScheduleStudents : loadMassiveStudents
-}
-
 /**
  * Public functions 
 **/
+class ScheduleController {
 
-async function loadMassiveTeachers(req,res){
+    async LoadMassiveTeachers(req,res){
 
-    const dir = req.body.dir;
-    const excelTeachers = await Excel.Read(dir);
-
-    const teachersAndSchedules = await cleanInformationTeachers(excelTeachers);
-    const createOrUpdateTeachers = await saveOrUpdateTeachers(teachersAndSchedules.teachers);
-    const insertHoarios = await saveSchedulesTeachers(teachersAndSchedules.schedules);
-
-    res.status(200).json(excelTeachers);
+        const dir = req.body.dir;
+        const excelTeachers = await Excel.Read(dir);
+    
+        const teachersAndSchedules = await cleanInformationTeachers(excelTeachers);
+        const createOrUpdateTeachers = await saveOrUpdateTeachers(teachersAndSchedules.teachers);
+        const insertHoarios = await saveSchedulesTeachers(teachersAndSchedules.schedules);
+    
+        res.status(200).json(excelTeachers);
+    }
+    
+    async LoadMassiveStudents(req,res){
+    
+        const dir = req.body.dir;
+        const excelStudents = await Excel.Read(dir);
+    
+        const studentsAndSchedules = await clearInformationStudents(excelStudents);
+    
+        const createOrUpdate = await saveOrUpdateStudents(studentsAndSchedules.students);
+    
+        const createSchedules = await saveSchedulesStudents(studentsAndSchedules.schedules);
+    
+        res.status(200).json(studentsAndSchedules)
+    }
+    
 }
-
-async function loadMassiveStudents(req,res){
-
-    const dir = req.body.dir;
-    const excelStudents = await Excel.Read(dir);
-
-    const studentsAndSchedules = await clearInformationStudents(excelStudents);
-
-    const createOrUpdate = await saveOrUpdateStudents(studentsAndSchedules.students);
-
-    const createSchedules = await saveSchedulesStudents(studentsAndSchedules.schedules);
-
-    res.status(200).json(studentsAndSchedules)
-}
-
 
 /**
  * Private functions 
@@ -150,4 +143,8 @@ async function saveSchedulesStudents(schedules){
 
     const inserted = await Schedule.insertMany(schedules);
 
+}
+
+module.exports ={
+    ScheduleController
 }

@@ -1,18 +1,20 @@
 const express = require('express');
 const router = require('express-promise-router')();
-const { List , Create , Update , Remove , LoadQuetions , Read } = require('../controllers/question')
+const { QuestionController } = require('../controllers/question')
 
 module.exports = function(app){
 
-    router.get('/question', List);
+    var questionController = new QuestionController();
+  
+    router.get('/question', questionController.List);
 
-    router.post('/question',Create);
+    router.post('/question',questionController.Create);
 
-    router.put('/question/:_id',Update);
+    router.put('/question/:_id',questionController.Update);
 
-    router.delete('/question/:_id',Remove);
+    router.delete('/question/:_id',questionController.Remove);
 
-    router.post('/question/load',LoadQuetions)
+    router.post('/question/load',questionController.LoadMassive)
 
     //union to express
     app.use('/api',router);

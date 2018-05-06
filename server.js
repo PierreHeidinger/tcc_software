@@ -40,7 +40,7 @@ class ExpressInit {
 
         // init server
         this.express.listen(port, function(){
-                 startCallback(port);
+            startCallback(port);
         })
 
         return this.express;
