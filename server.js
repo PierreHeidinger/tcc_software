@@ -45,13 +45,12 @@ class ExpressInit {
 
         return this.express;
     };
-}
+};
 
+const server = new ExpressInit();
 
-    const server = new ExpressInit();
-
-    server.config();
-    server.configMongoose();
-    server.start((port)=>{
-        console.log('server started on port : ' + port);
-    });
+server.config();
+server.configMongoose();
+server.start((port)=>{
+    console.log('server started on port : ' + port);
+});
