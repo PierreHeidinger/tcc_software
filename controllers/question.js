@@ -1,6 +1,8 @@
 
-const { ReadExcel } = require('../services/excel')
+const { Read } = require('../services/excel')
+const { Save } = require('../services/saveFile');
 const { Question ,Profile , Group } = require('../models/index');
+
 
 /**
  * Public class Controller
@@ -42,9 +44,10 @@ const { Question ,Profile , Group } = require('../models/index');
     }
     
     async LoadMassive(req,res){
-    
-        const dir = req.body.dir;
-        const information = await ReadExcel(dir);
+        
+        const dir = await Save(req.files.questions);
+   
+        const information = await Read(dir);
     
         const lista = await readInformation(information);
     
@@ -53,8 +56,8 @@ const { Question ,Profile , Group } = require('../models/index');
         const groups = await createOrUpdateGroups(lista.groups);
     
         const question = await createOrUpdateQuestions(lista.questions);
-    
-        res.status(200).json({message : "sending information to mongodb , wait please"});
+
+        res.status(200).json(information);
         
     }
     
