@@ -1,5 +1,5 @@
 
-const Exel = require('../services/excel')
+const Excel = require('../services/excel')
 const Files = require('../services/files');
 const { Question ,Profile , Group } = require('../models/index');
 
