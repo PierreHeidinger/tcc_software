@@ -1,6 +1,6 @@
 
-const { Read } = require('../services/excel')
-const { Save } = require('../services/saveFile');
+const Exel = require('../services/excel')
+const Files = require('../services/files');
 const { Question ,Profile , Group } = require('../models/index');
 
 
@@ -45,9 +45,9 @@ const { Question ,Profile , Group } = require('../models/index');
     
     async LoadMassive(req,res){
         
-        const dir = await Save(req.files.questions);
+        const dir = await Files.Save(req.files.questions);
    
-        const information = await Read(dir);
+        const information = await Excel.Read(dir);
     
         const lista = await readInformation(information);
     

@@ -1,6 +1,6 @@
 //models
-const {Schedule,Teacher,Student} = require('../models/index');
-
+const { Schedule,Teacher,Student } = require('../models/index');
+const Files = require('../services/files');
 const Excel = require('../services/excel');
 const {  typeSchedule } = require('../const/types')
 
@@ -13,28 +13,28 @@ class ScheduleController {
 
     async LoadMassiveTeachers(req,res){
 
-        const dir = req.body.dir;
-        const excelTeachers = await Excel.Read(dir);
-    
+        //if((req.files.teachers.name.split('.')).pop() != 'xls')throw new Error('only files excel');
+
+        const dir = await  Files.Save(req.files.teachers)
+        const excelTeachers = await Excel.Read(dir);   
         const teachersAndSchedules = await cleanInformationTeachers(excelTeachers);
-        const createOrUpdateTeachers = await saveOrUpdateTeachers(teachersAndSchedules.teachers);
-        const insertHoarios = await saveSchedulesTeachers(teachersAndSchedules.schedules);
+
+        //asyncronous upload of information
+        loadTeachers(teachersAndSchedules);
     
-        res.status(200).json(excelTeachers);
+        res.status(200).json("sending information of teachers , waiting please");
     }
     
     async LoadMassiveStudents(req,res){
     
-        const dir = req.body.dir;
+        const dir = await  Files.Save(req.files.students);
         const excelStudents = await Excel.Read(dir);
-    
         const studentsAndSchedules = await clearInformationStudents(excelStudents);
+
+        //asyncronous upload of information
+        laodStudents(studentsAndSchedules);
     
-        const createOrUpdate = await saveOrUpdateStudents(studentsAndSchedules.students);
-    
-        const createSchedules = await saveSchedulesStudents(studentsAndSchedules.schedules);
-    
-        res.status(200).json(studentsAndSchedules)
+        res.status(200).json("sending information of students, waiting please")
     }
     
 }
@@ -42,7 +42,8 @@ class ScheduleController {
 /**
  * Private functions 
 **/
-async function cleanInformationTeachers(excel){
+async function cleanInformationTeachers(excel)
+{
 
     var teachers = [];
     var schedules = [];
@@ -76,9 +77,10 @@ async function cleanInformationTeachers(excel){
     };
 
     return {"teachers" : teachers , "schedules" :schedules } ;
-}
+};
 
-async function saveOrUpdateTeachers(teachers){
+async function saveOrUpdateTeachers(teachers)
+{
 
 
     for(let teacher of teachers){
@@ -87,15 +89,10 @@ async function saveOrUpdateTeachers(teachers){
 
     }
 
-}
+};
 
-async function saveSchedulesTeachers(schedules){
-
-    const inserted = await Schedule.insertMany(schedules);
-
-}
-
-async function clearInformationStudents(excel){
+async function clearInformationStudents(excel)
+{
 
     var students = [];
     var schedules = [];
@@ -128,22 +125,37 @@ async function clearInformationStudents(excel){
     }
 
     return {students : students , schedules : schedules};
-}
+};
 
-async function saveOrUpdateStudents(students){
+async function saveOrUpdateStudents(students)
+{
 
     for(let student of students){
 
         const createOrUpdate = await  Student.update({ "RA" : student.RA },student,{upsert:true})
 
     }
-}
+};
 
-async function saveSchedulesStudents(schedules){
+async function loadTeachers(teachersAndSchedules)
+{
 
+    const createOrUpdateTeachers = await saveOrUpdateTeachers(teachersAndSchedules.teachers);
+    const insertHoarios = await saveSchedules(teachersAndSchedules.schedules);
+};
+
+async function laodStudents(studentsAndSchedules)
+{
+        
+    const createOrUpdate = await saveOrUpdateStudents(studentsAndSchedules.students);
+    
+    const createSchedules = await saveSchedules(studentsAndSchedules.schedules);
+};
+
+async function saveSchedules(schedules)
+{
     const inserted = await Schedule.insertMany(schedules);
-
-}
+};
 
 module.exports ={
     ScheduleController
