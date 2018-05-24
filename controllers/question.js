@@ -51,13 +51,9 @@ const { Question ,Profile , Group } = require('../models/index');
     
         const lista = await readInformation(information);
     
-        const profiles = await createOrUpdateProfiles(lista.profiles);
-    
-        const groups = await createOrUpdateGroups(lista.groups);
-    
-        const question = await createOrUpdateQuestions(lista.questions);
+        load(lista);
 
-        res.status(200).json(information);
+        res.status(200).json("sending information of questions , waiting please");
         
     }
     
@@ -133,6 +129,14 @@ async function createOrUpdateQuestions(questions){
 
         const createUpdate = await Question.update({ "content" : question.content } , question , { upsert : true });
     }
+}
+async function load(lista){
+
+    const profiles = await createOrUpdateProfiles(lista.profiles);
+    
+    const groups = await createOrUpdateGroups(lista.groups);
+
+    const question = await createOrUpdateQuestions(lista.questions);
 }
 
 
