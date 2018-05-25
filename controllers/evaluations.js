@@ -3,7 +3,7 @@ const {Evaluation,Teacher,Student,Profile} = require('../models/index');
 
 
 /**
- * Public class controller
+ * Public class controller az
  */
 class EvaluationController {
 
