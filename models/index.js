@@ -5,6 +5,7 @@ const Teacher = require('../models/teachers');
 const Student = require('../models/students');
 const Schedule = require('../models/schedule');
 const Evaluation = require('../models/evaluations');
+const Questionnaire = require('../models/questionnaires');
 
 module.exports = {
     Question,
@@ -13,5 +14,6 @@ module.exports = {
     Teacher,
     Student,
     Schedule,
-    Evaluation
+    Evaluation,
+    Questionnaire
 }

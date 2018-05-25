@@ -1,7 +1,7 @@
 
 const Excel = require('../services/excel')
 const Files = require('../services/files');
-const { Question ,Profile , Group } = require('../models/index');
+const { Question ,Profile , Group , Questionnaire } = require('../models/index');
 
 
 /**
@@ -51,10 +51,39 @@ const { Question ,Profile , Group } = require('../models/index');
     
         const lista = await readInformation(information);
     
-        load(lista);
+        var questionnaires = [];
+       
+        for (let profile of lista.profiles) {
+
+            let  questionnaire = {             
+                questionnaireType : profile.description
+            };
+
+
+            var questions = [];
+            
+            console.log(lista.questions);
+
+            for(let question of lista.questions.filter(_question => _question.profile == profile.description )){
+
+                console.log('asdas');
+
+                let localQuestion = { 
+                    text : question.content
+                 } 
+                 questions.push(localQuestion);
+            }
+
+            questionnaire.questions = questions
+
+            questionnaires.push(questionnaire);
+
+        }
+
+        await Questionnaire.insertMany(questionnaires);
 
         res.status(200).json("sending information of questions , waiting please");
-        
+                
     }
     
  }
@@ -85,8 +114,9 @@ async function readInformation(docInformation){
                 "group" : model.Grupo,
                 "profile" : model.Perfil
             }
-    
-            profiles.push(profile);
+            
+            var exists = profiles.find(x => x.description == model.Perfil);
+            if(!exists)profiles.push(profile);            
             groups.push(group);
             questions.push(question);
         })
