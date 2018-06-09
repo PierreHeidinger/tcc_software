@@ -1,22 +1,27 @@
 const mongoose = require('mongoose');
 const Question = require('../models/questions');
 const Profile = require('../models/profiles');
-
 const Schema = mongoose.Schema;
 
-const evaluationsSchema = new Schema({
+const evaluationSchema = new Schema({
 
-    profile : {
-        type : Profile.schema,
-        required : true,       
+    evaluator: String,
+    evaluated: String,
+    questionnaireType: String,
+    state: String,
+    creationDate: {
+        type: Date,
+        default: Date.now
     },
-    questions : {
-        type : [Question.schema],
-        required : true
+    updateDate: {
+        type: Date,
+        default: Date.now
     },
-    owner : Object,
-    evaluated : Object
-
+    questions: [{
+        id: String,
+        text: String,
+        answer: String
+    }]
 });
 
-module.exports = mongoose.model('evaluations',evaluationsSchema);
+module.exports = mongoose.model('evaluation', evaluationSchema);
