@@ -14,7 +14,7 @@ const questionnaireSchema = new Schema({
     questionnaireType: String,
     questions: [{
         text:String,
-        asnwerType:{
+        questionType:{
             type:String,
             default: "multiple choise"
         },
