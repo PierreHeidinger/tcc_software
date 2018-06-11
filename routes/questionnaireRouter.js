@@ -10,5 +10,6 @@ module.exports = function (app) {
     router.put('/questionnaire', questionnaireController.update);
     router.get('/questionnaire', questionnaireController.list);
     router.get('/questionnaire/:_id', questionnaireController.getQuestionnaireById);
+    router.get('/questionnaire/evaluator/:_id',questionnaireController.getQuestionnaireByEvaluator);
     app.use('/api', router);
 }
