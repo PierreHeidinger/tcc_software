@@ -1,5 +1,5 @@
 const { typeSchedule } = require('../const/types')
-const { Questionnaire, Teacher, Student, Profile, Question, Schedule } = require('../models/index');
+const { Questionnaire, Teacher, Student, Profile, Question, Schedule, Evaluation } = require('../models/index');
 
 
 class QuestionnaireController {
@@ -55,11 +55,11 @@ class QuestionnaireController {
     }
 
     async getQuestionnaireByEvaluator(req, res) {
-        console.log(req.params._id);
-        let evaluator = await Student.findOne({ "RA": req.params._id });
+        let ra = req.params._id;
+        let evaluator = await Student.findOne({ "RA": ra });
         if (!evaluator) throw new Error("Usuario invalido");
 
-        let schedule = await Schedule.findOne({ "owner.RA": evaluator.RA });
+        let schedule = await Schedule.findOne({ "owner.RA": ra });
         let scheduleByClass = await Schedule.find({ "class": schedule.class, "type": typeSchedule.Teacher });
         if (!scheduleByClass) throw new Error("No se encontraron aulas");
 
@@ -75,43 +75,64 @@ class QuestionnaireController {
             }
         }
 
-        console.log(teachers);
-        console.log(infraestruturas);
-
-        let questionnaires = await Questionnaire.find();
-        let questionnaireDto;
+        let evaluations = await Evaluation.find({ evaluator: ra });
+        let questionnaires = await Questionnaire.find({ state: true });
         let questionnairesDto = new Array();
+        let questionnaireDto;
+
         for (let questionnaire of questionnaires) {
             questionnaireDto = new Object();
             if (questionnaire.questionnaireType == "Aluno avalia a docente") {
                 for (let teacher of teachers) {
                     questionnaireDto = new Object();
-                    console.log(teacher);
                     questionnaireDto.questionnaire = questionnaire;
-                    questionnaireDto.evaluator = teacher;
+                    questionnaireDto.evaluated = teacher;
+                    questionnaireDto.evaluationStatus = await getEvaluationStatus(questionnaire, evaluations, teacher);
                     questionnairesDto.unshift(questionnaireDto);
                 }
             } else if (questionnaire.questionnaireType == "Aluno avalia a Infraestrutura") {
                 for (let infraestrutura of infraestruturas) {
                     questionnaireDto = new Object();
-                    console.log(infraestrutura);
                     questionnaireDto.questionnaire = questionnaire;
-                    questionnaireDto.evaluator = infraestrutura;
+                    questionnaireDto.evaluated = infraestrutura;
+                    questionnaireDto.evaluationStatus = await getEvaluationStatus(questionnaire, evaluations, infraestrutura);
                     questionnairesDto.unshift(questionnaireDto);
                 }
             } else {
                 questionnaireDto.questionnaire = questionnaire;
+                questionnaireDto.evaluationStatus = await getEvaluationStatus(questionnaire, evaluations);
                 questionnairesDto.push(questionnaireDto);
             }
-
         }
         return res.status(200).json(questionnairesDto);
     }
 
 }
 
-async function getTeachers(params) {
 
+async function getEvaluationStatus(params, evaluations, evaluated) {
+    for (let evaluation of evaluations) {
+        if (evaluation.questionnaireType == params.questionnaireType) {
+            if (evaluation.questionnaireType == "Aluno avalia a docente" || evaluation.questionnaireType == "Aluno avalia a Infraestrutura") {
+                if (evaluation.evaluated == evaluated) {
+                    return true;
+                }
+                break;
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+async function filterByEvaluationStatus(questionnairesDto, status) {
+    let questionnairesDto = new Array();
+    for (let dto of questionnairesDto) {
+        if(dto.evaluationStatus == status){
+            questionnairesDto.push(dto);
+        }
+    }
+    return questionnairesDto;
 }
 
 module.exports = {
