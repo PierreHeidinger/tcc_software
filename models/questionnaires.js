@@ -12,6 +12,8 @@ const questionnaireSchema = new Schema({
         default: Date.now
     },
     questionnaireType: String,
+    state: Boolean,
+    origin: String,
     questions: [{
         text:String,
         questionType:{
