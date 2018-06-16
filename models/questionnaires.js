@@ -18,7 +18,7 @@ const questionnaireSchema = new Schema({
         text:String,
         questionType:{
             type:String,
-            default: "multiple choise"
+            default: "radio"
         },
         options: {
             type:Array,

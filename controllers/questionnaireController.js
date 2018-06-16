@@ -50,7 +50,7 @@ class QuestionnaireController {
     }
 
     async getQuestionnaireById(req, res) {
-        let questionnaire = await Questionnaire.findOne({ "_id": req.params._id });
+        let questionnaire = await Questionnaire.findById(req.params._id);
         res.status(200).json(questionnaire);
     }
 
@@ -128,7 +128,7 @@ async function getEvaluationStatus(params, evaluations, evaluated) {
 async function filterByEvaluationStatus(questionnairesDto, status) {
     let questionnairesDto = new Array();
     for (let dto of questionnairesDto) {
-        if(dto.evaluationStatus == status){
+        if (dto.evaluationStatus == status) {
             questionnairesDto.push(dto);
         }
     }
