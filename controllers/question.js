@@ -74,8 +74,9 @@ class QuestionController {
             questionnaire.questions = questions;
             questionnaire.state = true;
             questionnaire.origin = "EXCEL"
-            questionnaire.startDate = new Date();
-            questionnaire.endDate = curretDate.setMonth(questionnaire.startDate.getMonth() + 6);
+            let curretDate = new Date();
+            questionnaire.startDate = curretDate;
+            questionnaire.endDate = new Date().setMonth(curretDate.getMonth() + 6);
             questionnaires.push(questionnaire);
         }
 
