@@ -79,29 +79,31 @@ class QuestionnaireController {
         let questionnaires = await Questionnaire.find({ state: true });
         let questionnairesDto = new Array();
         let questionnaireDto;
-
+        let currentDate = new Date();
         for (let questionnaire of questionnaires) {
-            questionnaireDto = new Object();
-            if (questionnaire.questionnaireType == "Aluno avalia a docente") {
-                for (let teacher of teachers) {
-                    questionnaireDto = new Object();
+            if (await isWithinDateRange(questionnaire, currentDate)) {
+                questionnaireDto = new Object();
+                if (questionnaire.questionnaireType == "Aluno avalia a docente") {
+                    for (let teacher of teachers) {
+                        questionnaireDto = new Object();
+                        questionnaireDto.questionnaire = questionnaire;
+                        questionnaireDto.evaluated = teacher;
+                        questionnaireDto.evaluationStatus = await getEvaluationStatus(questionnaire, evaluations, teacher);
+                        questionnairesDto.unshift(questionnaireDto);
+                    }
+                } else if (questionnaire.questionnaireType == "Aluno avalia a Infraestrutura") {
+                    for (let infraestrutura of infraestruturas) {
+                        questionnaireDto = new Object();
+                        questionnaireDto.questionnaire = questionnaire;
+                        questionnaireDto.evaluated = infraestrutura;
+                        questionnaireDto.evaluationStatus = await getEvaluationStatus(questionnaire, evaluations, infraestrutura);
+                        questionnairesDto.unshift(questionnaireDto);
+                    }
+                } else {
                     questionnaireDto.questionnaire = questionnaire;
-                    questionnaireDto.evaluated = teacher;
-                    questionnaireDto.evaluationStatus = await getEvaluationStatus(questionnaire, evaluations, teacher);
-                    questionnairesDto.unshift(questionnaireDto);
+                    questionnaireDto.evaluationStatus = await getEvaluationStatus(questionnaire, evaluations);
+                    questionnairesDto.push(questionnaireDto);
                 }
-            } else if (questionnaire.questionnaireType == "Aluno avalia a Infraestrutura") {
-                for (let infraestrutura of infraestruturas) {
-                    questionnaireDto = new Object();
-                    questionnaireDto.questionnaire = questionnaire;
-                    questionnaireDto.evaluated = infraestrutura;
-                    questionnaireDto.evaluationStatus = await getEvaluationStatus(questionnaire, evaluations, infraestrutura);
-                    questionnairesDto.unshift(questionnaireDto);
-                }
-            } else {
-                questionnaireDto.questionnaire = questionnaire;
-                questionnaireDto.evaluationStatus = await getEvaluationStatus(questionnaire, evaluations);
-                questionnairesDto.push(questionnaireDto);
             }
         }
         return res.status(200).json(questionnairesDto);
@@ -109,6 +111,9 @@ class QuestionnaireController {
 
 }
 
+async function isWithinDateRange(questionnaire, currentDate) {
+    return questionnaire.startDate < currentDate && questionnaire.endDate > currentDate;
+}
 
 async function getEvaluationStatus(params, evaluations, evaluated) {
     for (let evaluation of evaluations) {
