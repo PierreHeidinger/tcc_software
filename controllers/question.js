@@ -63,11 +63,7 @@ class QuestionController {
 
             var questions = [];
 
-            console.log(lista.questions);
-
             for (let question of lista.questions.filter(_question => _question.profile == profile.description)) {
-
-                console.log('asdas');
 
                 let localQuestion = {
                     text: question.content
@@ -78,12 +74,12 @@ class QuestionController {
             questionnaire.questions = questions;
             questionnaire.state = true;
             questionnaire.origin = "EXCEL"
+            questionnaire.startDate = new Date();
+            questionnaire.endDate = curretDate.setMonth(questionnaire.startDate.getMonth() + 6);
             questionnaires.push(questionnaire);
-
         }
 
         await Questionnaire.insertMany(questionnaires);
-
         res.status(200).json("sending information of questions , waiting please");
 
     }
