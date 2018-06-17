@@ -32,7 +32,11 @@ class QuestionnaireController {
     }
 
     async create(req, res) {
-        let questionnaire = await Questionnaire.insertMany(req.body);
+        let body = req.body;
+        await Questionnaire.update({ state: true, questionnaireType: body.questionnaireType }, { $set: { state: false } }, { multi: true });
+        body.origin = "DASHBOARD";
+        body.state = true;
+        let questionnaire = await Questionnaire.insertMany(body);
         res.status(200).json(questionnaire);
     }
 
